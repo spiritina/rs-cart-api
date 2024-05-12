@@ -1,0 +1,44 @@
+service: order-service
+useDotenv: true
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+  - serverless-plugin-optimize
+
+# custom:
+#   # Enable warmup on all functions (only for production and staging)
+#   warmup:
+#       enabled: true
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: eu-west-1
+  environment:
+    HOST: ${env:HOST}
+    DATABASE: ${env:DATABASE}
+    USERNAME: ${env:USERNAME}
+    PASSWORD: ${env:PASSWORD}
+    PORT: ${env:PORT}
+
+functions:
+  main: 
+    handler: src/main.handler
+    events:
+      - http:
+          method: ANY
+          path: /
+      - http:
+          path: '{proxy+}'
+          method: any
+package:
+  individually: true
+  exclude:
+    - node_modules/**
+    - venv/**
+    - test/**
+  include:
+    - dist/**      
+    - '!node_modules/**'        
